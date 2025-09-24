@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marquesina Web</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #message-input {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #fff;
+            color: #000;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        #char-counter {
+            width: 100%;
+            text-align: right;
+            margin-top: 5px;
+            color: #aaa;
+        }
+
+        #preview-text {
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 24px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #color-buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .color-button {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #fff;
+            margin: 0 8px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        #start-button {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #9B59B6;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* Estilos para la marquesina a pantalla completa */
+        #fullscreen-marquee {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: none; /* Oculto por defecto */
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .marquee-text {
+            font-size: 120px;
+            font-weight: bold;
+            white-space: nowrap;
+            animation: marquee 15s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Ocultar el cursor y el scrollbar en pantalla completa */
+        .no-scroll {
+            overflow: hidden;
+            cursor: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <textarea id="message-input" maxlength="150" placeholder="Escribe un mensaje (máx. 150 caracteres)"></textarea>
+        <div id="char-counter">0/150</div>
+        <div id="preview-text">¡Texto de vista previa!</div>
+        
+        <div id="color-buttons-container">
+            <div class="color-button" style="background-color: #FF5733;"></div>
+            <div class="color-button" style="background-color: #FFC300;"></div>
+            <div class="color-button" style="background-color: #33FF57;"></div>
+            <div class="color-button" style="background-color: #33A1FF;"></div>
+            <div class="color-button" style="background-color: #A133FF;"></div>
+        </div>
+
+        <button id="start-button">INICIAR ANIMACIÓN</button>
+    </div>
+
+    <div id="fullscreen-marquee">
+        <div class="marquee-text"></div>
+    </div>
+
+    <script>
+        const messageInput = document.getElementById('message-input');
+        const charCounter = document.getElementById('char-counter');
+        const previewText = document.getElementById('preview-text');
+        const colorButtonsContainer = document.getElementById('color-buttons-container');
+        const startButton = document.getElementById('start-button');
+        const fullscreenMarquee = document.getElementById('fullscreen-marquee');
+        const marqueeText = fullscreenMarquee.querySelector('.marquee-text');
+        const mainContainer = document.getElementById('main-container');
+
+        // Actualizar el contador y la vista previa al escribir
+        messageInput.addEventListener('input', () => {
+            const currentLength = messageInput.value.length;
+            charCounter.textContent = `${currentLength}/150`;
+            previewText.textContent = messageInput.value || '¡Texto de vista previa!';
+        });
+
+        // Cambiar el color del texto de vista previa
+        colorButtonsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('color-button')) {
+                const color = event.target.style.backgroundColor;
+                previewText.style.color = color;
+            }
+        });
+
+        // Iniciar la marquesina en pantalla completa
+        startButton.addEventListener('click', () => {
+            if (messageInput.value.trim() === '') {
+                alert('Por favor, escribe un mensaje primero.');
+                return;
+            }
+            
+            // Ocultar la interfaz de control y mostrar la marquesina
+            mainContainer.style.display = 'none';
+            fullscreenMarquee.style.display = 'flex';
+            document.body.classList.add('no-scroll');
+            
+            // Pasar el texto y el color a la marquesina
+            marqueeText.textContent = messageInput.value;
+            marqueeText.style.color = previewText.style.color;
+
+            // Al hacer clic, salir de la pantalla completa
+            fullscreenMarquee.addEventListener('click', () => {
+                fullscreenMarquee.style.display = 'none';
+                mainContainer.style.display = 'flex';
+                document.body.classList.remove('no-scroll');
+            }, { once: true }); // Solo se ejecuta una vez
+        });
+    </script>
+
+</body>
+</html>
